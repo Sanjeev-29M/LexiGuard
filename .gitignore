@@ -1,0 +1,50 @@
+# ========================
+# Python / Django (Backend)
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env.*
+!.env.example
+
+# Virtual environment
+backend/venv/
+backend/.venv/
+venv/
+
+# Django
+backend/db.sqlite3
+backend/media/
+backend/*.log
+backend/error_log.txt
+backend/available_models.txt
+backend/models_log.txt
+
+# Test / debug scripts
+backend/test_*.py
+backend/debug_*.py
+backend/list_models*.py
+backend/exhaustive_*.py
+
+# ========================
+# Node / Next.js (Frontend)
+# ========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.pnpm-debug.log*
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/*.tsbuildinfo
+
+# ========================
+# General
+# ========================
+.DS_Store
+*.pem
+Thumbs.db
+*.zip
