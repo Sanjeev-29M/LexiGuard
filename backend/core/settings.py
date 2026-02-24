@@ -36,6 +36,9 @@ DEBUG = env('DEBUG', default=True)
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+# Always allow Render domains
+ALLOWED_HOSTS += ['.onrender.com', 'localhost']
+
 
 
 # Application definition
