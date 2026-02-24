@@ -9,4 +9,4 @@ cmds = [
 ]
 
 [start]
-cmd = "/opt/venv/bin/python backend/manage.py migrate && /opt/venv/bin/gunicorn core.wsgi --chdir backend --bind 0.0.0.0:$PORT --log-file -"
+cmd = "DJANGO_SETTINGS_MODULE=core.settings /opt/venv/bin/python backend/manage.py migrate && DJANGO_SETTINGS_MODULE=core.settings /opt/venv/bin/gunicorn core.wsgi:application --chdir backend --bind 0.0.0.0:$PORT --workers 2 --log-file -"
