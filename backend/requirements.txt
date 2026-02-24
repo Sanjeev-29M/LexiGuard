@@ -9,3 +9,4 @@ google-generativeai
 python-docx
 whitenoise
 Pillow
+PyMuPDF
