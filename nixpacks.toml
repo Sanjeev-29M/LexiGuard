@@ -3,10 +3,9 @@ nixPkgs = ["python311"]
 
 [phases.install]
 cmds = [
-  "python3 -m venv /opt/venv",
-  "/opt/venv/bin/pip install --upgrade pip",
-  "/opt/venv/bin/pip install -r backend/requirements.txt"
+  "pip install --upgrade pip",
+  "pip install -r backend/requirements.txt"
 ]
 
 [start]
-cmd = "DJANGO_SETTINGS_MODULE=core.settings /opt/venv/bin/python backend/manage.py migrate && DJANGO_SETTINGS_MODULE=core.settings /opt/venv/bin/gunicorn core.wsgi:application --chdir backend --bind 0.0.0.0:$PORT --workers 2 --log-file -"
+cmd = "cd backend && python manage.py collectstatic --no-input && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --log-file -"
