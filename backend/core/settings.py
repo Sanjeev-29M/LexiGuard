@@ -35,8 +35,9 @@ DEBUG = env('DEBUG', default=True)
 # Gemini API Key
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 # Always allow Render and Railway domains
-ALLOWED_HOSTS += ['.onrender.com', '.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS += ['.onrender.com', '.railway.app']
 
 
 
