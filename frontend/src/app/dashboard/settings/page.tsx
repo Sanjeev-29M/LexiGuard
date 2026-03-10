@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
     const [profile, setProfile] = useState({
@@ -10,8 +10,12 @@ export default function SettingsPage() {
     });
 
     const [preferences, setPreferences] = useState({
-        darkMode: typeof window !== 'undefined' ? localStorage.getItem('theme') !== 'light' : true
+        darkMode: true
     });
+
+    useEffect(() => {
+        setPreferences({ darkMode: localStorage.getItem('theme') !== 'light' });
+    }, []);
 
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -66,6 +70,7 @@ export default function SettingsPage() {
                                     value={profile.name}
                                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                                     className="w-full px-4 py-3 bg-[var(--background)] border-[var(--card-border)] text-[var(--foreground)]"
+                                    suppressHydrationWarning
                                 />
                             </div>
                             <div>
@@ -75,6 +80,7 @@ export default function SettingsPage() {
                                     value={profile.company}
                                     onChange={(e) => setProfile({ ...profile, company: e.target.value })}
                                     className="w-full px-4 py-3 bg-[var(--background)] border-[var(--card-border)] text-[var(--foreground)]"
+                                    suppressHydrationWarning
                                 />
                             </div>
                         </div>
@@ -85,6 +91,7 @@ export default function SettingsPage() {
                                 value={profile.email}
                                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                                 className="w-full px-4 py-3 bg-[var(--background)] border-[var(--card-border)] text-[var(--foreground)]"
+                                suppressHydrationWarning
                             />
                         </div>
                         <div className="pt-4">

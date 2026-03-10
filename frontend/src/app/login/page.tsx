@@ -11,6 +11,7 @@ function LoginForm() {
     const redirect = searchParams.get("redirect") || "/dashboard";
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -23,17 +24,34 @@ function LoginForm() {
             const res = await fetch(`${API_BASE}/api/auth/login/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({
+                    username,
+                    password,
+                    is_admin_login: isAdmin
+                }),
             });
 
             if (!res.ok) {
-                throw new Error("Invalid credentials");
+                const errData = await res.json().catch(() => ({}));
+                const msg =
+                    errData?.detail ||
+                    errData?.non_field_errors?.[0] ||
+                    errData?.username?.[0] ||
+                    errData?.password?.[0] ||
+                    "Login failed. Please check your username and password.";
+                throw new Error(msg);
             }
 
             const data = await res.json();
             localStorage.setItem("access_token", data.access);
             localStorage.setItem("refresh_token", data.refresh);
-            router.push(redirect);
+            localStorage.setItem("is_staff", data.is_staff ? "true" : "false");
+
+            if (data.is_staff) {
+                router.push("/admin-dashboard");
+            } else {
+                router.push(redirect);
+            }
         } catch (err: any) {
             setError(err.message || "Failed to login");
         } finally {
@@ -83,7 +101,16 @@ function LoginForm() {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                        <div className="flex justify-between items-end mb-2">
+                            <label className="block text-sm font-medium text-slate-300">Username</label>
+                            <button
+                                type="button"
+                                onClick={() => setIsAdmin(!isAdmin)}
+                                className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded transition-all duration-300 ${isAdmin ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)]' : 'bg-slate-800 text-slate-500 hover:text-slate-400'}`}
+                            >
+                                {isAdmin ? 'Admin Mode' : 'Admin?'}
+                            </button>
+                        </div>
                         <input
                             type="text"
                             required

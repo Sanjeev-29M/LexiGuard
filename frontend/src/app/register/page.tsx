@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -19,18 +20,49 @@ export default function RegisterPage() {
         setError("");
 
         try {
+            // Step 1: Register
             const res = await fetch(`${API_BASE}/api/auth/register/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({ username, email, password, is_staff: isAdmin }),
             });
 
             if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.username?.[0] || errorData.password?.[0] || "Registration failed");
+                const errorData = await res.json().catch(() => ({}));
+                console.error("Registration error details:", errorData);
+
+                // Extract error message from DRF's common formats
+                let errorMsg = "Registration failed";
+                if (typeof errorData === 'object') {
+                    const firstError = Object.values(errorData)[0];
+                    if (Array.isArray(firstError)) {
+                        errorMsg = firstError[0];
+                    } else if (typeof firstError === 'string') {
+                        errorMsg = firstError;
+                    } else if (errorData.detail) {
+                        errorMsg = errorData.detail;
+                    }
+                }
+                throw new Error(errorMsg);
             }
 
-            router.push("/login");
+            // Step 2: Auto-login with same credentials
+            const loginRes = await fetch(`${API_BASE}/api/auth/login/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!loginRes.ok) {
+                // Registration worked but login failed — redirect to login page
+                router.push("/login");
+                return;
+            }
+
+            const data = await loginRes.json();
+            localStorage.setItem("access_token", data.access);
+            localStorage.setItem("refresh_token", data.refresh);
+            router.push("/dashboard");
         } catch (err: any) {
             setError(err.message || "Failed to register");
         } finally {
@@ -60,7 +92,16 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleRegister} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                        <div className="flex justify-between items-end mb-2">
+                            <label className="block text-sm font-medium text-slate-300">Username</label>
+                            <button
+                                type="button"
+                                onClick={() => setIsAdmin(!isAdmin)}
+                                className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded transition-all duration-300 ${isAdmin ? 'bg-violet-600 text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]' : 'bg-slate-800 text-slate-500 hover:text-slate-400'}`}
+                            >
+                                {isAdmin ? 'Admin Mode' : 'Admin?'}
+                            </button>
+                        </div>
                         <input
                             type="text"
                             required

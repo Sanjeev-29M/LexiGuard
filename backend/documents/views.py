@@ -38,33 +38,8 @@ def extract_text_from_file(file_obj, filename):
     file_obj.seek(0)
     return text
 
-def get_best_model():
-    """Dynamically finds the best available Gemini model for the current key."""
-    try:
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        
-        # Preference order
-        preferences = [
-            'models/gemini-2.0-flash',
-            'models/gemini-1.5-flash',
-            'models/gemini-2.0-flash-exp',
-            'models/gemini-pro',
-            'models/gemini-flash-latest'
-        ]
-        
-        for pref in preferences:
-            if pref in available_models:
-                return pref
-        
-        # Fallback to the first available model that supports content generation
-        if available_models:
-            return available_models[0]
-            
-    except Exception as e:
-        print(f"Error discovering models: {e}")
-    
-    return 'models/gemini-1.5-flash' # Hard fallback
+# Hardcoded model — confirmed available for this API key via list_models()
+GEMINI_MODEL = 'gemini-2.5-flash'
 
 class DocumentUploadView(generics.CreateAPIView):
     queryset = Document.objects.all()
@@ -104,11 +79,8 @@ class DocumentUploadView(generics.CreateAPIView):
         try:
             genai.configure(api_key=settings.GEMINI_API_KEY)
             
-            # Dynamic model selection
-            model_name = get_best_model()
-            print(f"Using Gemini Model: {model_name}")
-            
-            model = genai.GenerativeModel(model_name, generation_config={"response_mime_type": "application/json"})
+            print(f"Using Gemini Model: {GEMINI_MODEL}")
+            model = genai.GenerativeModel(GEMINI_MODEL, generation_config={"response_mime_type": "application/json"})
             
             prompt = f"""
             You are an expert AI Legal Document Analyzer. 

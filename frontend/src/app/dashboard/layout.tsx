@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pathname = usePathname();
     const [isClient, setIsClient] = useState(false);
 
-    const [user, setUser] = useState<{ username: string, email: string } | null>(null);
+    const [user, setUser] = useState<{ username: string, email: string, is_staff: boolean } | null>(null);
     const [showLogoutMenu, setShowLogoutMenu] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
@@ -66,6 +66,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { label: "Summary", href: "/dashboard/summary", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
         { label: "Settings", href: "/dashboard/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
     ];
+
+    if (user?.is_staff) {
+        navItems.push({ label: "Admin Panel", href: "/admin-dashboard", icon: "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0112 3v8h8a10.003 10.003 0 01-9.962 8.614l-.048-.01z" });
+    }
 
     return (
         <div className={`flex min-h-screen font-sans transition-colors duration-300 bg-[var(--background)] text-[var(--foreground)] ${theme === 'dark' ? '' : 'light'}`}>

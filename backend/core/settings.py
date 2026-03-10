@@ -35,9 +35,8 @@ DEBUG = env('DEBUG', default=True)
 # Gemini API Key
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 # Always allow Render and Railway domains
-ALLOWED_HOSTS += ['.onrender.com', '.railway.app', 'localhost']
+ALLOWED_HOSTS += ['.onrender.com', '.railway.app', 'localhost', '127.0.0.1']
 
 
 
@@ -95,6 +94,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
 }
+
+# Fix for Neon/Supabase with SSL
+if not DEBUG and DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
+    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
