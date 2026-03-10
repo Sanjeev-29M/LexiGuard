@@ -10,6 +10,8 @@ from documents.models import Document
 from documents.serializers import DocumentSerializer
 from django.db.models import Count
 from rest_framework.permissions import IsAdminUser
+from django.db import connection
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -96,3 +98,34 @@ class SystemStatsView(APIView):
                 "values": stats_values
             }
         })
+
+class VulnerableLoginView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        # VULNERABLE RAW SQL QUERY
+        query = f"SELECT * FROM users_customuser WHERE username = '{username}'"
+        
+        print(f"SQL DEBUG: Executing query: {query}")
+        
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            row = cursor.fetchone()
+            
+            if row:
+                # Map raw row to dummy user ID (Simplified for demo)
+                user_id = row[0] 
+                user = User.objects.get(id=user_id)
+                
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'username': user.username,
+                    'is_staff': user.is_staff
+                })
+            
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
