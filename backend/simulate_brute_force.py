@@ -2,7 +2,7 @@ import requests
 import time
 
 # Target endpoint (assuming local dev server is running on port 8000)
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://lxg-mque.onrender.com"
 ENDPOINT = "/api/auth/register/"
 
 print(f"--- Starting Brute Force Simulation on {ENDPOINT} ---")

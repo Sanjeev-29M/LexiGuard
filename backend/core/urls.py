@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from users.views import (
-    RegisterView, ProfileView, AdminUserListView, 
-    AdminUserDetailView, SystemStatsView, VulnerableLoginView
-)
-from users.serializers import CustomTokenObtainPairSerializer
+from users.views import RegisterView, ProfileView, AdminUserListView, AdminUserDetailView, SystemStatsView
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -13,7 +9,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/auth/vulnerable-login/', VulnerableLoginView.as_view(), name='vulnerable_login'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/register/', RegisterView.as_view(), name='register'),
     path('api/auth/profile/', ProfileView.as_view(), name='profile'),
