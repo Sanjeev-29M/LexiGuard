@@ -18,7 +18,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'is_staff')
+        fields = ('id', 'username', 'email', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
                 username=validated_data['username'],
                 email=validated_data.get('email', ''),
                 password=validated_data['password'],
-                is_staff=validated_data.get('is_staff', False)
+                is_staff=self.initial_data.get('is_staff', False)
             )
             print(f"REGISTER DEBUG: Created user {user.username}, is_staff={user.is_staff}")
             return user
@@ -40,6 +40,28 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
+
+class UserSearchView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        # VULNERABLE: Direct string formatting in raw SQL
+        sql = f"SELECT id, username, email FROM users_customuser WHERE username LIKE '%{query}%'"
+        
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            
+        results = []
+        for row in rows:
+            results.append({
+                "id": row[0],
+                "username": row[1],
+                "email": row[2]
+            })
+            
+        return Response(results)
 
 
 class ProfileView(APIView):

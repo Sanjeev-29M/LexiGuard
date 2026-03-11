@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/register/', RegisterView.as_view(), name='register'),
     path('api/auth/profile/', ProfileView.as_view(), name='profile'),
+    path('api/auth/search/', UserSearchView.as_view(), name='user_search'),
     path('api/documents/', include('documents.urls')),
     
     # Admin Data Endpoints

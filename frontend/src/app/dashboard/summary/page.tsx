@@ -75,7 +75,7 @@ export default function SummaryPage() {
                     {filteredDocs.map(doc => (
                         <a
                             key={doc.id}
-                            href={`#doc-${doc.id}`}
+                            href={`/dashboard/summary/${doc.id}`}
                             className="block p-3 rounded-lg hover:bg-[var(--nav-active)] transition-colors text-sm font-medium border border-transparent hover:border-[var(--card-border)]"
                         >
                             <div className="truncate text-[var(--foreground)]">{doc.file_name || doc.title}</div>

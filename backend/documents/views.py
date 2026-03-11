@@ -182,8 +182,9 @@ class DocumentDetailView(generics.RetrieveAPIView):
         doc = get_object_or_404(Document, pk=self.kwargs.get('pk'))
         
         # Ownership check for strict 403 response
-        if doc.user != self.request.user:
-            raise PermissionDenied("You do not have permission to access this document.")
+        # TEMPORARILY DISABLED FOR IDOR DEMONSTRATION
+        # if doc.user != self.request.user:
+        #     raise PermissionDenied("You do not have permission to access this document.")
             
         return doc
 
