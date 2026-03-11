@@ -106,26 +106,36 @@ class VulnerableLoginView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         
-        # VULNERABLE RAW SQL QUERY
+        # VULNERABLE RAW SQL QUERY - Intentionally insecure
+        # We add a space at the end to make it easier to inject comments
         query = f"SELECT * FROM users_customuser WHERE username = '{username}'"
         
         print(f"SQL DEBUG: Executing query: {query}")
         
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            row = cursor.fetchone()
-            
-            if row:
-                # Map raw row to dummy user ID (Simplified for demo)
-                user_id = row[0] 
-                user = User.objects.get(id=user_id)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                row = cursor.fetchone()
                 
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'username': user.username,
-                    'is_staff': user.is_staff
-                })
-            
-            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                if row:
+                    # Map raw row to user object
+                    # In Django, row[0] is typically the ID
+                    user_id = row[0] 
+                    user = User.objects.get(id=user_id)
+                    
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                        'username': user.username,
+                        'is_staff': user.is_staff
+                    })
+                
+                return Response({"detail": "Invalid credentials (No user found matching that name)"}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            print(f"SQL ERROR: {e}")
+            return Response({
+                "detail": "SQL Syntax Error or Database Error",
+                "error": str(e),
+                "query": query
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
