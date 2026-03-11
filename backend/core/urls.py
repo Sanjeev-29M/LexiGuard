@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from users.views import RegisterView, ProfileView, AdminUserListView, AdminUserDetailView, SystemStatsView
+from users.views import RegisterView, ProfileView, AdminUserListView, AdminUserDetailView, SystemStatsView, UserSearchView
+from users.serializers import CustomTokenObtainPairSerializer
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
